@@ -63,10 +63,21 @@ export function ContactForm() {
         body: JSON.stringify(form),
       })
 
-      const payload = (await response.json()) as { message?: string }
+      const rawBody = await response.text()
+      let payload: { message?: string } = {}
+      if (rawBody) {
+        try {
+          payload = JSON.parse(rawBody) as { message?: string }
+        } catch {
+          payload = {}
+        }
+      }
 
       if (!response.ok) {
-        throw new Error(payload.message ?? 'Не удалось отправить сообщение.')
+        throw new Error(
+          payload.message ??
+            `Сервер временно недоступен (${response.status}). Попробуйте еще раз через минуту.`,
+        )
       }
 
       setSuccessMessage('Сообщение отправлено. Я свяжусь с вами в ближайшее время.')
