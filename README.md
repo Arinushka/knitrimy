@@ -38,6 +38,28 @@ MAIL_FROM=your-yandex-login@yandex.ru
 - `MAIL_TO` — почта получателя заявок.
 - `SMTP_PASS` — пароль приложения (не обычный пароль почты).
 
+## Деплой на Render
+
+Проект подготовлен для деплоя в Render как единый Node-сервис (фронтенд + API формы).
+
+1. Загрузите проект в GitHub.
+2. В Render нажмите **New +** -> **Blueprint** и выберите репозиторий.
+3. Render автоматически подхватит `render.yaml`.
+4. Заполните переменные окружения в Render:
+   - `SMTP_HOST`
+   - `SMTP_PORT`
+   - `SMTP_SECURE`
+   - `SMTP_USER`
+   - `SMTP_PASS`
+   - `MAIL_TO`
+   - `MAIL_FROM`
+5. Запустите деплой.
+
+Что происходит на проде:
+- `npm run build` собирает фронтенд в `dist/`.
+- `npm start` запускает `server/index.js`.
+- Сервер раздает `dist` и обрабатывает `POST /api/contact`.
+
 ## Структура проекта
 
 ```text

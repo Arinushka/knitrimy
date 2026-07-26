@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import express from 'express'
 import nodemailer from 'nodemailer'
+import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -10,7 +11,7 @@ const __dirname = path.dirname(__filename)
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
 const app = express()
-const port = Number(process.env.SERVER_PORT ?? 8787)
+const port = Number(process.env.PORT ?? process.env.SERVER_PORT ?? 8787)
 
 app.use(express.json())
 
@@ -115,6 +116,14 @@ app.post('/api/contact', async (req, res) => {
   }
 })
 
+const distPath = path.resolve(__dirname, '../dist')
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath))
+  app.get(/^(?!\/api).*/, (_req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'))
+  })
+}
+
 app.listen(port, () => {
-  console.log(`Contact API is running on http://localhost:${port}`)
+  console.log(`App is running on http://localhost:${port}`)
 })
