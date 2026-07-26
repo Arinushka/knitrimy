@@ -16,6 +16,11 @@ export function useRevealOnScroll<T extends HTMLElement>() {
       return
     }
 
+    if (!('IntersectionObserver' in window)) {
+      setIsVisible(true)
+      return
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -29,8 +34,12 @@ export function useRevealOnScroll<T extends HTMLElement>() {
     )
 
     observer.observe(element)
+    const fallbackTimer = window.setTimeout(() => {
+      setIsVisible(true)
+    }, 1200)
 
     return () => {
+      window.clearTimeout(fallbackTimer)
       observer.disconnect()
     }
   }, [])
