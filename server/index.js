@@ -55,56 +55,59 @@ app.get('/api/health', (_req, res) => {
 })
 
 app.post('/api/contact', async (req, res) => {
-  const validationError = validateBody(req.body)
-  if (validationError) {
-    return res.status(400).json({ message: validationError })
-  }
-
-  const smtpHost = process.env.SMTP_HOST
-  const smtpPort = Number(process.env.SMTP_PORT ?? 465)
-  const smtpUser = process.env.SMTP_USER
-  const smtpPass = process.env.SMTP_PASS
-  const smtpSecure = process.env.SMTP_SECURE !== 'false'
-  const mailTo = process.env.MAIL_TO ?? 'arrina.mykhova@yandex.ru'
-  const mailFrom = process.env.MAIL_FROM ?? smtpUser
-
-  if (!smtpHost || !smtpUser || !smtpPass || !mailFrom) {
-    const missing = [
-      !smtpHost ? 'SMTP_HOST' : null,
-      !smtpUser ? 'SMTP_USER' : null,
-      !smtpPass ? 'SMTP_PASS' : null,
-      !mailFrom ? 'MAIL_FROM' : null,
-    ].filter(Boolean)
-
-    return res.status(500).json({
-      message: `Сервер почты не настроен. Отсутствуют: ${missing.join(', ')}`,
-    })
-  }
-
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpSecure,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-  })
-
-  const { name, contactMethod, message } = req.body
-
-  const subject = `Новая заявка с сайта knit.rimy от ${name.trim()}`
-  const text = [
-    'Новая заявка с сайта knit.rimy',
-    '',
-    `Имя: ${name.trim()}`,
-    `Способ связи: ${contactMethod.trim()}`,
-    '',
-    'Сообщение:',
-    message.trim(),
-  ].join('\n')
-
   try {
+    const validationError = validateBody(req.body)
+    if (validationError) {
+      return res.status(400).json({ message: validationError })
+    }
+
+    const smtpHost = process.env.SMTP_HOST
+    const smtpPort = Number(process.env.SMTP_PORT ?? 465)
+    const smtpUser = process.env.SMTP_USER
+    const smtpPass = process.env.SMTP_PASS
+    const smtpSecure = process.env.SMTP_SECURE !== 'false'
+    const mailTo = process.env.MAIL_TO ?? 'arrina.mykhova@yandex.ru'
+    const mailFrom = process.env.MAIL_FROM ?? smtpUser
+
+    if (!smtpHost || !smtpUser || !smtpPass || !mailFrom) {
+      const missing = [
+        !smtpHost ? 'SMTP_HOST' : null,
+        !smtpUser ? 'SMTP_USER' : null,
+        !smtpPass ? 'SMTP_PASS' : null,
+        !mailFrom ? 'MAIL_FROM' : null,
+      ].filter(Boolean)
+
+      return res.status(500).json({
+        message: `Сервер почты не настроен. Отсутствуют: ${missing.join(', ')}`,
+      })
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
+      requireTLS: !smtpSecure,
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    })
+
+    const { name, contactMethod, message } = req.body
+    const subject = `Новая заявка с сайта knit.rimy от ${name.trim()}`
+    const text = [
+      'Новая заявка с сайта knit.rimy',
+      '',
+      `Имя: ${name.trim()}`,
+      `Способ связи: ${contactMethod.trim()}`,
+      '',
+      'Сообщение:',
+      message.trim(),
+    ].join('\n')
+
     await transporter.sendMail({
       from: mailFrom,
       to: mailTo,
@@ -129,6 +132,13 @@ app.post('/api/contact', async (req, res) => {
         : 'Не удалось отправить сообщение. Проверьте SMTP настройки.',
     })
   }
+})
+
+app.use((error, _req, res, _next) => {
+  console.error('Unhandled server error:', error)
+  res.status(500).json({
+    message: 'Внутренняя ошибка сервера при обработке формы.',
+  })
 })
 
 const distPath = path.resolve(__dirname, '../dist')
