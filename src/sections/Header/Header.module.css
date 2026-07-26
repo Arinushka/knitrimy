@@ -1,0 +1,139 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+  backdrop-filter: blur(10px);
+  background: rgba(249, 245, 239, 0.9);
+  border-bottom: 1px solid rgba(111, 138, 109, 0.15);
+}
+
+.inner {
+  min-height: 4.6rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  text-decoration: none;
+  color: #2f2721;
+  font-size: 1.35rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.logoMark {
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 1.5px solid #6f8a6d;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.logoMark span {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #6f8a6d;
+}
+
+.desktopNav ul {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.desktopNav a {
+  text-decoration: none;
+  font-size: 0.95rem;
+  color: #4b3f37;
+}
+
+.desktopNav a:hover {
+  color: var(--color-green-accent);
+}
+
+.contactButton {
+  justify-self: end;
+}
+
+.burger {
+  display: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(111, 138, 109, 0.25);
+  background: transparent;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.26rem;
+  cursor: pointer;
+}
+
+.burger span {
+  width: 1.15rem;
+  height: 2px;
+  background: #3f342d;
+}
+
+.mobileMenu {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .inner {
+    grid-template-columns: auto auto 1fr;
+  }
+
+  .desktopNav,
+  .contactButton {
+    display: none;
+  }
+
+  .burger {
+    display: inline-flex;
+    justify-self: end;
+  }
+
+  .mobileMenu {
+    display: grid;
+    gap: 1rem;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition:
+      max-height var(--transition-soft),
+      opacity var(--transition-soft);
+    border-top: 1px solid rgba(111, 138, 109, 0.13);
+    background: rgba(249, 245, 239, 0.97);
+    padding-inline: 1rem;
+  }
+
+  .open {
+    max-height: 320px;
+    opacity: 1;
+    padding-block: 1rem 1.1rem;
+  }
+
+  .mobileMenu ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .mobileMenu a {
+    text-decoration: none;
+    color: #4b3f37;
+  }
+}

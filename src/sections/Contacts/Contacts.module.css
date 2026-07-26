@@ -1,0 +1,53 @@
+.contacts {
+  background: rgba(232, 217, 217, 0.28);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr minmax(260px, 450px);
+  gap: 2rem;
+  align-items: start;
+}
+
+.info {
+  display: grid;
+  gap: 1rem;
+}
+
+.list {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.list li {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.list span {
+  color: #5e5046;
+  font-size: 0.86rem;
+}
+
+.list a {
+  width: fit-content;
+  text-decoration: none;
+  color: #2f2923;
+}
+
+.formWrap {
+  border-radius: var(--radius-md);
+  background: #fff;
+  padding: 1rem;
+  border: 1px solid rgba(111, 138, 109, 0.16);
+  box-shadow: 0 14px 24px -22px var(--color-shadow);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

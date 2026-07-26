@@ -1,0 +1,42 @@
+.footer {
+  background: #f2e8dc;
+  border-top: 1px solid rgba(111, 138, 109, 0.2);
+  padding: 1.3rem 1rem 1.6rem;
+}
+
+.layout {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  margin: 0 0 0.2rem;
+  font-size: 1.2rem;
+  color: #322922;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.meta {
+  display: grid;
+  gap: 0.4rem;
+  justify-items: end;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.links a {
+  text-decoration: none;
+  color: #4b3f37;
+}
+
+@media (max-width: 620px) {
+  .meta {
+    justify-items: start;
+  }
+}
