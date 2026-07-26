@@ -15,6 +15,15 @@ const port = Number(process.env.PORT ?? process.env.SERVER_PORT ?? 8787)
 
 app.use(express.json())
 
+function getMailEnvState() {
+  const required = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM']
+  const missing = required.filter((key) => !process.env[key])
+  return {
+    configured: missing.length === 0,
+    missing,
+  }
+}
+
 function validateBody(body) {
   if (!body || typeof body !== 'object') {
     return 'Некорректные данные формы.'
@@ -36,7 +45,13 @@ function validateBody(body) {
 }
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true })
+  const state = getMailEnvState()
+  res.json({
+    ok: true,
+    smtpConfigured: state.configured,
+    missing: state.missing,
+    runtime: process.env.RENDER ? 'render' : 'local',
+  })
 })
 
 app.post('/api/contact', async (req, res) => {
@@ -125,5 +140,9 @@ if (fs.existsSync(distPath)) {
 }
 
 app.listen(port, () => {
+  const state = getMailEnvState()
   console.log(`App is running on http://localhost:${port}`)
+  if (!state.configured) {
+    console.warn(`SMTP is not configured. Missing: ${state.missing.join(', ')}`)
+  }
 })
