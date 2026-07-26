@@ -1,13 +1,13 @@
-import work1 from '../assets/works/work-1.png'
-import work2 from '../assets/works/work-2.png'
-import work3 from '../assets/works/work-3.png'
-import work4 from '../assets/works/work-4.png'
-import work5 from '../assets/works/work-5.png'
-import work6 from '../assets/works/work-6.png'
-import work7 from '../assets/works/work-7.png'
-import work8 from '../assets/works/work-8.png'
-import work9 from '../assets/works/work-9.png'
-import work10 from '../assets/works/work-10.png'
+import work1 from '../assets/works/work-1-opt.jpg'
+import work2 from '../assets/works/work-2-opt.jpg'
+import work3 from '../assets/works/work-3-opt.jpg'
+import work4 from '../assets/works/work-4-opt.jpg'
+import work5 from '../assets/works/work-5-opt.jpg'
+import work6 from '../assets/works/work-6-opt.jpg'
+import work7 from '../assets/works/work-7-opt.jpg'
+import work8 from '../assets/works/work-8-opt.jpg'
+import work9 from '../assets/works/work-9-opt.jpg'
+import work10 from '../assets/works/work-10-opt.jpg'
 
 export type PortfolioItem = {
   id: number
