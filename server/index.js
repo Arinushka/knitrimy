@@ -1,6 +1,5 @@
 import dotenv from 'dotenv'
 import express from 'express'
-import nodemailer from 'nodemailer'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -16,7 +15,7 @@ const port = Number(process.env.PORT ?? process.env.SERVER_PORT ?? 8787)
 app.use(express.json())
 
 function getMailEnvState() {
-  const required = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM']
+  const required = ['RESEND_API_KEY', 'MAIL_TO', 'MAIL_FROM']
   const missing = required.filter((key) => !process.env[key])
   return {
     configured: missing.length === 0,
@@ -48,8 +47,9 @@ app.get('/api/health', (_req, res) => {
   const state = getMailEnvState()
   res.json({
     ok: true,
-    smtpConfigured: state.configured,
+    mailConfigured: state.configured,
     missing: state.missing,
+    provider: 'resend',
     runtime: process.env.RENDER ? 'render' : 'local',
   })
 })
@@ -61,19 +61,14 @@ app.post('/api/contact', async (req, res) => {
       return res.status(400).json({ message: validationError })
     }
 
-    const smtpHost = process.env.SMTP_HOST
-    const smtpPort = Number(process.env.SMTP_PORT ?? 465)
-    const smtpUser = process.env.SMTP_USER
-    const smtpPass = process.env.SMTP_PASS
-    const smtpSecure = process.env.SMTP_SECURE !== 'false'
-    const mailTo = process.env.MAIL_TO ?? 'arrina.mykhova@yandex.ru'
-    const mailFrom = process.env.MAIL_FROM ?? smtpUser
+    const resendApiKey = process.env.RESEND_API_KEY
+    const mailTo = process.env.MAIL_TO ?? 'arina.mykhova@yandex.ru'
+    const mailFrom = process.env.MAIL_FROM ?? 'onboarding@resend.dev'
 
-    if (!smtpHost || !smtpUser || !smtpPass || !mailFrom) {
+    if (!resendApiKey || !mailTo || !mailFrom) {
       const missing = [
-        !smtpHost ? 'SMTP_HOST' : null,
-        !smtpUser ? 'SMTP_USER' : null,
-        !smtpPass ? 'SMTP_PASS' : null,
+        !resendApiKey ? 'RESEND_API_KEY' : null,
+        !mailTo ? 'MAIL_TO' : null,
         !mailFrom ? 'MAIL_FROM' : null,
       ].filter(Boolean)
 
@@ -81,20 +76,6 @@ app.post('/api/contact', async (req, res) => {
         message: `Сервер почты не настроен. Отсутствуют: ${missing.join(', ')}`,
       })
     }
-
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpSecure,
-      requireTLS: !smtpSecure,
-      connectionTimeout: 15000,
-      greetingTimeout: 15000,
-      socketTimeout: 20000,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    })
 
     const { name, contactMethod, message } = req.body
     const subject = `Новая заявка с сайта knit.rimy от ${name.trim()}`
@@ -108,28 +89,52 @@ app.post('/api/contact', async (req, res) => {
       message.trim(),
     ].join('\n')
 
-    await transporter.sendMail({
-      from: mailFrom,
-      to: mailTo,
-      replyTo: mailFrom,
-      subject,
-      text,
+    const resendResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: mailFrom,
+        to: [mailTo],
+        subject,
+        text,
+      }),
     })
 
-    return res.status(200).json({ ok: true })
+    const rawBody = await resendResponse.text()
+    let payload = {}
+    if (rawBody) {
+      try {
+        payload = JSON.parse(rawBody)
+      } catch {
+        payload = { message: rawBody }
+      }
+    }
+
+    if (!resendResponse.ok) {
+      return res.status(502).json({
+        message: 'Сервис отправки писем недоступен.',
+        details: payload,
+      })
+    }
+
+    return res.status(200).json({
+      ok: true,
+      provider: 'resend',
+    })
   } catch (error) {
     console.error('Email send error:', error)
     const details =
       error && typeof error === 'object'
-        ? [error.code, error.responseCode, error.response]
-            .filter(Boolean)
-            .join(' | ')
+        ? [error.code, error.message].filter(Boolean).join(' | ')
         : ''
 
     return res.status(500).json({
       message: details
-        ? `Не удалось отправить сообщение. SMTP: ${details}`
-        : 'Не удалось отправить сообщение. Проверьте SMTP настройки.',
+        ? `Не удалось отправить сообщение. Email API: ${details}`
+        : 'Не удалось отправить сообщение. Проверьте настройки Email API.',
     })
   }
 })
@@ -153,6 +158,6 @@ app.listen(port, () => {
   const state = getMailEnvState()
   console.log(`App is running on http://localhost:${port}`)
   if (!state.configured) {
-    console.warn(`SMTP is not configured. Missing: ${state.missing.join(', ')}`)
+    console.warn(`Email API is not configured. Missing: ${state.missing.join(', ')}`)
   }
 })

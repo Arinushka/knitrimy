@@ -11,5 +11,5 @@ export const contactsConfig: ContactsConfig = {
   instagram: socialLinks.instagram,
   tiktok: socialLinks.tiktok,
   telegram: 'https://t.me/arinamousy',
-  email: 'arrina.mykhova@yandex.ru',
+  email: 'arina.mykhova@yandex.ru',
 }

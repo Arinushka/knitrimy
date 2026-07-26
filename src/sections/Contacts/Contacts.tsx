@@ -1,4 +1,3 @@
-import { ContactForm } from '../../components/ContactForm/ContactForm'
 import { contactsConfig } from '../../config/contacts'
 import { useRevealOnScroll } from '../../hooks/useRevealOnScroll'
 import styles from './Contacts.module.css'
@@ -47,26 +46,22 @@ export function Contacts() {
             {contactItems
               .filter(hasValue)
               .map((item) => (
-              <li key={item.label}>
-                <span>{item.label}</span>
-                <a
-                  href={
-                    item.label === 'Электронная почта'
-                      ? `mailto:${item.value}`
-                      : item.value
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {formatContactValue(item.value)}
-                </a>
-              </li>
-            ))}
+                <li key={item.label}>
+                  <span>{item.label}</span>
+                  <a
+                    href={
+                      item.label === 'Электронная почта'
+                        ? `mailto:${item.value}`
+                        : item.value
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {formatContactValue(item.value)}
+                  </a>
+                </li>
+              ))}
           </ul>
-        </div>
-
-        <div className={styles.formWrap}>
-          <ContactForm />
         </div>
       </div>
     </section>

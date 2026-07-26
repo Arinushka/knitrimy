@@ -8,7 +8,7 @@
 npm install
 ```
 
-Создайте `.env` на основе `.env.example` и заполните SMTP данные.
+Создайте `.env` на основе `.env.example` и заполните данные Resend API.
 
 ## Запуск проекта
 
@@ -19,24 +19,21 @@ npm run dev
 Откройте адрес из терминала (обычно `http://localhost:5173`).
 Команда запускает одновременно фронтенд и сервер отправки формы.
 
-## Настройка отправки формы на email
+## Настройка отправки формы на email (Resend)
 
-Форма отправляет данные на серверный endpoint `POST /api/contact`, а сервер пересылает письмо на вашу почту.
+Форма отправляет данные на серверный endpoint `POST /api/contact`, а сервер пересылает письмо через Resend API (HTTPS).
 
 Минимальные переменные в `.env`:
 
 ```env
-SMTP_HOST=smtp.yandex.ru
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=your-yandex-login@yandex.ru
-SMTP_PASS=your-app-password
-MAIL_TO=arrina.mykhova@yandex.ru
-MAIL_FROM=your-yandex-login@yandex.ru
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxx
+MAIL_TO=arina.mykhova@yandex.ru
+MAIL_FROM=onboarding@resend.dev
 ```
 
 - `MAIL_TO` — почта получателя заявок.
-- `SMTP_PASS` — пароль приложения (не обычный пароль почты).
+- `MAIL_FROM` — отправитель, должен быть разрешен в Resend.
+- `RESEND_API_KEY` — API ключ из панели Resend.
 
 ## Деплой на Render
 
@@ -46,11 +43,7 @@ MAIL_FROM=your-yandex-login@yandex.ru
 2. В Render нажмите **New +** -> **Blueprint** и выберите репозиторий.
 3. Render автоматически подхватит `render.yaml`.
 4. Заполните переменные окружения в Render:
-   - `SMTP_HOST`
-   - `SMTP_PORT`
-   - `SMTP_SECURE`
-   - `SMTP_USER`
-   - `SMTP_PASS`
+   - `RESEND_API_KEY`
    - `MAIL_TO`
    - `MAIL_FROM`
 5. Запустите деплой.
