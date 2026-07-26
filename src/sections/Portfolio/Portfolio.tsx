@@ -2,19 +2,13 @@ import { useState } from 'react'
 import { ImageModal } from '../../components/ImageModal/ImageModal'
 import { PortfolioCard } from '../../components/PortfolioCard/PortfolioCard'
 import { portfolioItems, type PortfolioItem } from '../../data/portfolioItems'
-import { useRevealOnScroll } from '../../hooks/useRevealOnScroll'
 import styles from './Portfolio.module.css'
 
 export function Portfolio() {
   const [activeItem, setActiveItem] = useState<PortfolioItem | null>(null)
-  const { elementRef, isVisible } = useRevealOnScroll<HTMLElement>()
 
   return (
-    <section
-      id="portfolio"
-      ref={elementRef}
-      className={`${styles.portfolio} reveal ${isVisible ? 'visible' : ''}`}
-    >
+    <section id="portfolio" className={styles.portfolio}>
       <div className="container">
         <h2 className="section-title">Мои работы</h2>
         <p className="section-subtitle">

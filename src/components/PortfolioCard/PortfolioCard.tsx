@@ -18,7 +18,8 @@ export function PortfolioCard({ item, onOpen }: PortfolioCardProps) {
         <img
           src={item.image}
           alt={item.alt}
-          loading="lazy"
+          loading="eager"
+          decoding="async"
           className={styles.image}
           width={420}
           height={520}
